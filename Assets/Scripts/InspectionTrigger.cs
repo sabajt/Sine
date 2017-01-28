@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RadioTrigger : MonoBehaviour {
+public class InspectionTrigger : MonoBehaviour {
 
-	// Generic
 	public GameObject anchor;
 	public GameObject canvas;
 
@@ -14,54 +12,47 @@ public class RadioTrigger : MonoBehaviour {
 	private bool playerInsideTarget = false;
 	private bool isViewingTarget = false;
 
-	// Radio
-	public List<AudioClip> audioClips = new List<AudioClip>();
-	private int radioIndex = 0;
-	const int radioIndexMax = 3;
+	// Delegates
+	public delegate void StartViewTarget();
+	public static event StartViewTarget OnStartViewTarget;
 
-	// Use this for initialization
+	public delegate void EndViewTarget();
+	public static event EndViewTarget OnEndViewTarget;
+
+	public delegate void UpdateViewingTarget();
+	public static event UpdateViewingTarget OnUpdateViewingTarget;
+
 	void Start () {
-		// Generic
 		canvas.SetActive (false);
 		canvasScript = canvas.GetComponent<EventCanvasScript> ();
 		canvasScript.hideDetailText ();
 		cameraScript = GameObject.Find ("CameraController").GetComponent<CameraScript> ();
 	}
-
-	// Update is called once per frame
+	
 	void Update () {
-
-		if (playerInsideTarget) {
-
-			// Generic Event Code
+		if (playerInsideTarget == true) {
 			if (Input.GetKeyDown (KeyCode.E)) {
 				if (isViewingTarget == false) {
-					isViewingTarget = true;
-
-					cameraScript.focusTarget();
+					cameraScript.focusTarget ();
 					canvasScript.showDetailText ();
-
+					if (OnStartViewTarget != null) {
+						OnStartViewTarget ();
+					}
 				} else {
-					isViewingTarget = false;
 					cameraScript.unfocusTarget ();
 					canvasScript.hideDetailText ();
+					if (OnEndViewTarget != null) {
+						OnEndViewTarget ();
+					}
 				}
+				isViewingTarget = !isViewingTarget;
 			}
 
 			if (isViewingTarget) {
 				cameraScript.lerpTarget (anchor.transform.position, anchor.transform.rotation, 3.2f);
 
-				// Radio station selection
-				if (Input.GetKeyDown (KeyCode.Return)) {
-					radioIndex++;
-					if (radioIndex > radioIndexMax) {
-						radioIndex = 0;
-					}
-
-					AudioSource audio = GetComponent<AudioSource>();
-					audio.clip = audioClips [radioIndex];
-					audio.Play();
-					Debug.Log ("playing audio: " + audio.clip.name);
+				if (OnUpdateViewingTarget != null) {
+					OnUpdateViewingTarget ();
 				}
 			}
 		}

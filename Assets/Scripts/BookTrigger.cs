@@ -5,16 +5,6 @@ using UnityEngine;
 
 public class BookTrigger : MonoBehaviour {
 
-	// Generic
-	public GameObject anchor;
-	public GameObject canvas;
-
-	private CameraScript cameraScript;
-	private EventCanvasScript canvasScript;
-	private bool playerInsideTarget = false;
-	private bool isViewingTarget = false;
-	private bool hasSelectedBook = false;
-
 	// Event
 	public GameObject bookshelf;
 	public AudioClip bookSlide;
@@ -22,6 +12,7 @@ public class BookTrigger : MonoBehaviour {
 	public AudioClip correctReveal;
 	public AudioClip bookshelfSlide;
 
+	private bool hasSelectedBook = false;
 	private List<GameObject> books = new List<GameObject>();
 	private List<Vector3> bookDefPositions = new List<Vector3> ();
 	private List<Quaternion> bookDefRotations = new List<Quaternion>();
@@ -38,17 +29,76 @@ public class BookTrigger : MonoBehaviour {
 	private bool hasUnlocked = false;
 
 	void Start () {
-		// Generic
-		canvas.SetActive (false);
-		canvasScript = canvas.GetComponent<EventCanvasScript> ();
-		canvasScript.hideDetailText ();
-		cameraScript = GameObject.Find ("CameraController").GetComponent<CameraScript> ();
-			
-		// Event
 		setupBooks ();
-
 		origShelfPos = bookshelf.transform.position;
 		unlockShelfPos = new Vector3 (origShelfPos.x, origShelfPos.y, origShelfPos.z + 2);
+	}
+
+	void Update () {
+		if (hasUnlocked) {
+			moveBookshelf ();
+		}
+	}
+		
+	void OnEnable () {
+		InspectionTrigger.OnStartViewTarget += OnStartViewTarget;
+		InspectionTrigger.OnEndViewTarget += OnEndViewTarget;
+		InspectionTrigger.OnUpdateViewingTarget += OnUpdateViewingTarget;
+	}
+
+	void OnDisable() {
+		InspectionTrigger.OnStartViewTarget -= OnStartViewTarget;
+		InspectionTrigger.OnEndViewTarget -= OnEndViewTarget;
+		InspectionTrigger.OnUpdateViewingTarget -= OnUpdateViewingTarget;
+	}
+
+	void OnStartViewTarget () {
+		// No-op
+	}
+
+	void OnEndViewTarget () {
+		resetBooks ();
+	}
+
+	void OnUpdateViewingTarget () {
+
+		// Book selection
+		if (Input.GetKeyDown (KeyCode.LeftArrow)) {
+			bookIndex--;
+			if (bookIndex < 0) {
+				bookIndex = 0;
+			} else {
+				resetBooks ();
+			}
+		}
+		if (Input.GetKeyDown (KeyCode.RightArrow)) {
+			bookIndex++;
+			if (bookIndex > BookIndexMax) {
+				bookIndex = BookIndexMax;
+			} else {
+				resetBooks ();
+			}
+		}
+
+		GameObject book = books[bookIndex];
+
+		// select book
+		if (Input.GetKeyDown (KeyCode.Return)) {
+			if (!hasSelectedBook) {
+				hasSelectedBook = true;
+				if (bookIndex == correctIndex) {
+					StartCoroutine(UnlockAfterDelay(1.3f));
+				}
+			}
+		}
+		if (hasSelectedBook) {
+			// pull out / rotate book from shelf
+			book.transform.position = Vector3.Lerp (book.transform.position, bookPullPositions[bookIndex], Time.deltaTime * 3.0f);
+			book.transform.rotation = book.transform.rotation = Quaternion.Lerp (book.transform.rotation, bookPullRotations[bookIndex], Time.deltaTime * 3.0f);
+		}
+
+		// scroll thru / highlight book
+		book.transform.position = Vector3.Lerp (book.transform.position, bookSelPositions[bookIndex], Time.deltaTime * 3.6f);	
 	}
 
 	void setupBooks () {
@@ -80,96 +130,13 @@ public class BookTrigger : MonoBehaviour {
 		}
 	}
 
-	void zoomOut() {
-		resetBooks ();
-		isViewingTarget = false;
-		cameraScript.unfocusTarget ();
-		canvasScript.hideDetailText ();
-	}
-
 	void moveBookshelf() {
 		bookshelf.transform.position = Vector3.Lerp (bookshelf.transform.position, unlockShelfPos, Time.deltaTime * 3.0f);
 	}
 
-	void Update () {
-
-		if (hasUnlocked) {
-			moveBookshelf ();
-		}
-
-		if (playerInsideTarget == true) {
-
-			// Generic 
-			if (Input.GetKeyDown (KeyCode.E)) {
-				if (isViewingTarget == false) {
-					isViewingTarget = true;
-
-					cameraScript.focusTarget();
-					canvasScript.showDetailText ();
-
-				} else {
-					zoomOut ();
-				}
-			}
-
-			// Event
-			if (isViewingTarget) {
-				cameraScript.lerpTarget (anchor.transform.position, anchor.transform.rotation, 3.2f);
-
-				// Book selection
-				if (Input.GetKeyDown (KeyCode.LeftArrow)) {
-					bookIndex--;
-					if (bookIndex < 0) {
-						bookIndex = 0;
-					} else {
-						resetBooks ();
-					}
-				}
-				if (Input.GetKeyDown (KeyCode.RightArrow)) {
-					bookIndex++;
-					if (bookIndex > BookIndexMax) {
-						bookIndex = BookIndexMax;
-					} else {
-						resetBooks ();
-					}
-				}
-
-				GameObject book = books[bookIndex];
-
-				// select book
-				if (Input.GetKeyDown (KeyCode.Return)) {
-					if (!hasSelectedBook) {
-						hasSelectedBook = true;
-						if (bookIndex == correctIndex) {
-							StartCoroutine(UnlockAfterDelay(1.3f));
-						}
-					}
-				}
-				if (hasSelectedBook) {
-					// pull out / rotate book from shelf
-					book.transform.position = Vector3.Lerp (book.transform.position, bookPullPositions[bookIndex], Time.deltaTime * 3.0f);
-					book.transform.rotation = book.transform.rotation = Quaternion.Lerp (book.transform.rotation, bookPullRotations[bookIndex], Time.deltaTime * 3.0f);
-				}
-
-				// scroll thru / highlight book
-				book.transform.position = Vector3.Lerp (book.transform.position, bookSelPositions[bookIndex], Time.deltaTime * 3.6f);
-			}
-		}
-	}
-
 	IEnumerator UnlockAfterDelay(float time) {
 		yield return new WaitForSeconds(time);
-		zoomOut ();
+		resetBooks ();
 		hasUnlocked = true;
-	}
-
-	void OnTriggerEnter(Collider other) {
-		playerInsideTarget = other.gameObject.name == "FPSController";
-		canvas.SetActive(playerInsideTarget);
-	}
-
-	void OnTriggerExit( Collider other ){
-		playerInsideTarget = other.gameObject.name != "FPSController";
-		canvas.SetActive(playerInsideTarget);
 	}
 }
