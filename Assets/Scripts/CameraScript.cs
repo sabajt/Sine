@@ -23,7 +23,7 @@ public class CameraScript : MonoBehaviour {
 		
 	}
 
-	public void focusTarget() {
+	public void FocusTarget() {
 		eventCamera.transform.position = fpsCharacter.transform.position;
 		eventCamera.transform.rotation = fpsCharacter.transform.rotation;
 
@@ -35,7 +35,7 @@ public class CameraScript : MonoBehaviour {
 		fpsCharacter.GetComponent<Camera> ().enabled = false;
 	}
 
-	public void unfocusTarget() {
+	public void UnfocusTarget() {
 		fpsCharacter.GetComponent<Camera> ().enabled = true;
 		fpsController.SetActive (true);
 		fpsCharacter.SetActive (true);
@@ -44,7 +44,7 @@ public class CameraScript : MonoBehaviour {
 		eventCamera.GetComponent<AudioListener> ().enabled = false;
 	}
 
-	public void lerpTarget(Vector3 toPosition, Quaternion toRotation, float speed) {
+	public void LerpTarget(Vector3 toPosition, Quaternion toRotation, float speed) {
 		eventCamera.transform.position = Vector3.Lerp (eventCamera.transform.position, toPosition, Time.deltaTime * speed);
 		eventCamera.transform.rotation = eventCamera.transform.rotation = Quaternion.Lerp (eventCamera.transform.rotation, toRotation, Time.deltaTime * speed);
 	}

@@ -38,18 +38,18 @@ public class RadioTrigger : MonoBehaviour {
 				if (isViewingTarget == false) {
 					isViewingTarget = true;
 
-					cameraScript.focusTarget();
+					cameraScript.FocusTarget();
 					canvasScript.showDetailText ();
 
 				} else {
 					isViewingTarget = false;
-					cameraScript.unfocusTarget ();
+					cameraScript.UnfocusTarget ();
 					canvasScript.hideDetailText ();
 				}
 			}
 
 			if (isViewingTarget) {
-				cameraScript.lerpTarget (anchor.transform.position, anchor.transform.rotation, 3.2f);
+				cameraScript.LerpTarget (anchor.transform.position, anchor.transform.rotation, 3.2f);
 
 				// Radio station selection
 				if (Input.GetKeyDown (KeyCode.Return)) {

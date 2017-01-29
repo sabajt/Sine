@@ -27,9 +27,10 @@ public class BookTrigger : MonoBehaviour {
 	private Vector3 origShelfPos; 
 	private Vector3 unlockShelfPos;
 	private bool hasUnlocked = false;
+	private InspectionTrigger inspectionTrigger;
 
 	void Start () {
-		setupBooks ();
+		SetupBooks ();
 		origShelfPos = bookshelf.transform.position;
 		unlockShelfPos = new Vector3 (origShelfPos.x, origShelfPos.y, origShelfPos.z + 2);
 	}
@@ -41,15 +42,17 @@ public class BookTrigger : MonoBehaviour {
 	}
 		
 	void OnEnable () {
-		InspectionTrigger.OnStartViewTarget += OnStartViewTarget;
-		InspectionTrigger.OnEndViewTarget += OnEndViewTarget;
-		InspectionTrigger.OnUpdateViewingTarget += OnUpdateViewingTarget;
+		inspectionTrigger = gameObject.GetComponent<InspectionTrigger> ();
+
+		inspectionTrigger.OnStartViewTarget += OnStartViewTarget;
+		inspectionTrigger.OnEndViewTarget += OnEndViewTarget;
+		inspectionTrigger.OnUpdateViewingTarget += OnUpdateViewingTarget;
 	}
 
 	void OnDisable() {
-		InspectionTrigger.OnStartViewTarget -= OnStartViewTarget;
-		InspectionTrigger.OnEndViewTarget -= OnEndViewTarget;
-		InspectionTrigger.OnUpdateViewingTarget -= OnUpdateViewingTarget;
+		inspectionTrigger.OnStartViewTarget -= OnStartViewTarget;
+		inspectionTrigger.OnEndViewTarget -= OnEndViewTarget;
+		inspectionTrigger.OnUpdateViewingTarget -= OnUpdateViewingTarget;
 	}
 
 	void OnStartViewTarget () {
@@ -57,7 +60,7 @@ public class BookTrigger : MonoBehaviour {
 	}
 
 	void OnEndViewTarget () {
-		resetBooks ();
+		ResetBooks ();
 	}
 
 	void OnUpdateViewingTarget () {
@@ -68,7 +71,7 @@ public class BookTrigger : MonoBehaviour {
 			if (bookIndex < 0) {
 				bookIndex = 0;
 			} else {
-				resetBooks ();
+				ResetBooks ();
 			}
 		}
 		if (Input.GetKeyDown (KeyCode.RightArrow)) {
@@ -76,7 +79,7 @@ public class BookTrigger : MonoBehaviour {
 			if (bookIndex > BookIndexMax) {
 				bookIndex = BookIndexMax;
 			} else {
-				resetBooks ();
+				ResetBooks ();
 			}
 		}
 
@@ -96,12 +99,12 @@ public class BookTrigger : MonoBehaviour {
 			book.transform.position = Vector3.Lerp (book.transform.position, bookPullPositions[bookIndex], Time.deltaTime * 3.0f);
 			book.transform.rotation = book.transform.rotation = Quaternion.Lerp (book.transform.rotation, bookPullRotations[bookIndex], Time.deltaTime * 3.0f);
 		}
-
+			
 		// scroll thru / highlight book
 		book.transform.position = Vector3.Lerp (book.transform.position, bookSelPositions[bookIndex], Time.deltaTime * 3.6f);	
 	}
 
-	void setupBooks () {
+	void SetupBooks () {
 		for (int i = 0; i <= BookIndexMax; i++) {
 			GameObject book = GameObject.Find ("book" + i);
 			books.Add (book);
@@ -120,7 +123,7 @@ public class BookTrigger : MonoBehaviour {
 		}
 	}
 
-	void resetBooks () {
+	void ResetBooks () {
 		hasSelectedBook = false;
 		int i = 0;
 		foreach (GameObject book in books) {
@@ -136,7 +139,8 @@ public class BookTrigger : MonoBehaviour {
 
 	IEnumerator UnlockAfterDelay(float time) {
 		yield return new WaitForSeconds(time);
-		resetBooks ();
+		ResetBooks ();
 		hasUnlocked = true;
+		inspectionTrigger.EndViewingTarget ();
 	}
 }

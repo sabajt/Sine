@@ -14,13 +14,13 @@ public class InspectionTrigger : MonoBehaviour {
 
 	// Delegates
 	public delegate void StartViewTarget();
-	public static event StartViewTarget OnStartViewTarget;
+	public event StartViewTarget OnStartViewTarget;
 
 	public delegate void EndViewTarget();
-	public static event EndViewTarget OnEndViewTarget;
+	public event EndViewTarget OnEndViewTarget;
 
 	public delegate void UpdateViewingTarget();
-	public static event UpdateViewingTarget OnUpdateViewingTarget;
+	public event UpdateViewingTarget OnUpdateViewingTarget;
 
 	void Start () {
 		canvas.SetActive (false);
@@ -30,30 +30,22 @@ public class InspectionTrigger : MonoBehaviour {
 	}
 	
 	void Update () {
-		if (playerInsideTarget == true) {
-			if (Input.GetKeyDown (KeyCode.E)) {
-				if (isViewingTarget == false) {
-					cameraScript.focusTarget ();
-					canvasScript.showDetailText ();
-					if (OnStartViewTarget != null) {
-						OnStartViewTarget ();
-					}
-				} else {
-					cameraScript.unfocusTarget ();
-					canvasScript.hideDetailText ();
-					if (OnEndViewTarget != null) {
-						OnEndViewTarget ();
-					}
-				}
-				isViewingTarget = !isViewingTarget;
+		if (playerInsideTarget == false) {
+			return;
+		}
+			
+		if (Input.GetKeyDown (KeyCode.E)) {
+			if (isViewingTarget == false) {
+				BeginViewingTarget ();
+			} else {
+				EndViewingTarget ();	
 			}
+		}
 
-			if (isViewingTarget) {
-				cameraScript.lerpTarget (anchor.transform.position, anchor.transform.rotation, 3.2f);
-
-				if (OnUpdateViewingTarget != null) {
-					OnUpdateViewingTarget ();
-				}
+		if (isViewingTarget) {
+			cameraScript.LerpTarget (anchor.transform.position, anchor.transform.rotation, 3.2f);
+			if (OnUpdateViewingTarget != null) {
+				OnUpdateViewingTarget ();
 			}
 		}
 	}
@@ -66,5 +58,23 @@ public class InspectionTrigger : MonoBehaviour {
 	void OnTriggerExit( Collider other ){
 		playerInsideTarget = other.gameObject.name != "FPSController";
 		canvas.SetActive(playerInsideTarget);
+	}
+
+	public void BeginViewingTarget() {
+		isViewingTarget = true;
+		cameraScript.FocusTarget ();
+		canvasScript.showDetailText ();
+		if (OnStartViewTarget != null) {
+			OnStartViewTarget ();
+		}
+	}
+
+	public void EndViewingTarget() {
+		isViewingTarget = false;
+		cameraScript.UnfocusTarget ();
+		canvasScript.hideDetailText ();
+		if (OnEndViewTarget != null) {
+			OnEndViewTarget ();
+		}
 	}
 }
