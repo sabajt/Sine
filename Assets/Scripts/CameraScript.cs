@@ -4,18 +4,21 @@ using UnityEngine;
 
 public class CameraScript : MonoBehaviour {
 
+	public Camera eventCamera;
+	public AudioListener eventCameraAudioListener;
+
 	private GameObject fpsCharacter;
 	private GameObject fpsController;
-	private GameObject eventCamera;
+	private Camera fpsCamera;
 
 	// Use this for initialization
 	void Start () {
 		fpsCharacter = GameObject.Find ("FirstPersonCharacter");
 		fpsController = GameObject.Find ("FPSController");
-		eventCamera = GameObject.Find ("EventCamera");
+		fpsCamera = fpsCharacter.GetComponent<Camera> ();
 
-		eventCamera.GetComponent<Camera> ().enabled = false;
-		eventCamera.GetComponent<AudioListener> ().enabled = false;
+		eventCamera.enabled = false;
+		eventCameraAudioListener.enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -24,11 +27,11 @@ public class CameraScript : MonoBehaviour {
 	}
 
 	public void FocusTarget() {
-		eventCamera.transform.position = fpsCharacter.transform.position;
-		eventCamera.transform.rotation = fpsCharacter.transform.rotation;
+		transform.position = fpsCharacter.transform.position;
+		transform.rotation = fpsCharacter.transform.rotation;
 
-		eventCamera.GetComponent<Camera> ().enabled = true;
-		eventCamera.GetComponent<AudioListener> ().enabled = true;
+		eventCamera.enabled = true;
+		eventCameraAudioListener.enabled = true;
 
 		fpsController.SetActive (false);
 		fpsCharacter.SetActive (false);
@@ -36,16 +39,16 @@ public class CameraScript : MonoBehaviour {
 	}
 
 	public void UnfocusTarget() {
-		fpsCharacter.GetComponent<Camera> ().enabled = true;
+		fpsCamera.enabled = true;
 		fpsController.SetActive (true);
 		fpsCharacter.SetActive (true);
 
-		eventCamera.GetComponent<Camera> ().enabled = false;
-		eventCamera.GetComponent<AudioListener> ().enabled = false;
+		eventCamera.enabled = false;
+		eventCameraAudioListener.enabled = false;
 	}
 
 	public void LerpTarget(Vector3 toPosition, Quaternion toRotation, float speed) {
-		eventCamera.transform.position = Vector3.Lerp (eventCamera.transform.position, toPosition, Time.deltaTime * speed);
-		eventCamera.transform.rotation = eventCamera.transform.rotation = Quaternion.Lerp (eventCamera.transform.rotation, toRotation, Time.deltaTime * speed);
+		transform.position = Vector3.Lerp (transform.position, toPosition, Time.deltaTime * speed);
+		transform.rotation = transform.rotation = Quaternion.Lerp (transform.rotation, toRotation, Time.deltaTime * speed);
 	}
 }

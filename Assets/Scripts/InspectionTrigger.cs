@@ -26,7 +26,7 @@ public class InspectionTrigger : MonoBehaviour {
 		canvas.SetActive (false);
 		canvasScript = canvas.GetComponent<EventCanvasScript> ();
 		canvasScript.hideDetailText ();
-		cameraScript = GameObject.Find ("CameraController").GetComponent<CameraScript> ();
+		cameraScript = GameObject.Find ("EventCamera").GetComponent<CameraScript> ();
 	}
 	
 	void Update () {
