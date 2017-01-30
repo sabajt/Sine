@@ -2946,6 +2946,7 @@ GameObject:
   - component: {fileID: 637609981}
   - component: {fileID: 637609980}
   - component: {fileID: 637609984}
+  - component: {fileID: 637609985}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -2977,8 +2978,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f9864aaaaa884d6db5fc5a52aadf702, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anchor: {fileID: 880915415}
-  canvas: {fileID: 2068029900}
   audioClips:
   - {fileID: 8300000, guid: 677a80211d1534fb0abca2bf4256d837, type: 3}
   - {fileID: 8300000, guid: 208b60e94694c4234a3cc27f8a26a1f9, type: 3}
@@ -3127,6 +3126,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &637609985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 637609978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4c1f5937294d4d41a1cdb58c5e9baa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchor: {fileID: 880915415}
+  canvas: {fileID: 2068029900}
 --- !u!1001 &643680558
 Prefab:
   m_ObjectHideFlags: 0

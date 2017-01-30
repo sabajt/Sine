@@ -5,28 +5,26 @@ using UnityEngine;
 
 public class BookTrigger : MonoBehaviour {
 
-	// Event
 	public GameObject bookshelf;
 	public AudioClip bookSlide;
 	public AudioClip bookReveal;
 	public AudioClip correctReveal;
 	public AudioClip bookshelfSlide;
 
-	private bool hasSelectedBook = false;
+	const int BookIndexMax = 8;
+	const int CorrectIndex = 3;
+
 	private List<GameObject> books = new List<GameObject>();
 	private List<Vector3> bookDefPositions = new List<Vector3> ();
 	private List<Quaternion> bookDefRotations = new List<Quaternion>();
 	private List<Vector3> bookSelPositions = new List<Vector3>();
 	private List<Vector3> bookPullPositions = new List<Vector3>();
 	private List<Quaternion> bookPullRotations = new List<Quaternion>();
-
+	private bool hasSelectedBook = false;
+	private bool hasUnlocked = false;
 	private int bookIndex = 0;
-	const int BookIndexMax = 8;
-	const int correctIndex = 3;
-
 	private Vector3 origShelfPos; 
 	private Vector3 unlockShelfPos;
-	private bool hasUnlocked = false;
 	private InspectionTrigger inspectionTrigger;
 
 	void Start () {
@@ -56,7 +54,7 @@ public class BookTrigger : MonoBehaviour {
 	}
 
 	void OnStartViewTarget () {
-		// No-op
+		
 	}
 
 	void OnEndViewTarget () {
@@ -89,7 +87,7 @@ public class BookTrigger : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Return)) {
 			if (!hasSelectedBook) {
 				hasSelectedBook = true;
-				if (bookIndex == correctIndex) {
+				if (bookIndex == CorrectIndex) {
 					StartCoroutine(UnlockAfterDelay(1.3f));
 				}
 			}
