@@ -49,6 +49,6 @@ public class CameraScript : MonoBehaviour {
 
 	public void LerpTarget(Vector3 toPosition, Quaternion toRotation, float speed) {
 		transform.position = Vector3.Lerp (transform.position, toPosition, Time.deltaTime * speed);
-		transform.rotation = transform.rotation = Quaternion.Lerp (transform.rotation, toRotation, Time.deltaTime * speed);
+		transform.rotation = Quaternion.Lerp (transform.rotation, toRotation, Time.deltaTime * speed);
 	}
 }
