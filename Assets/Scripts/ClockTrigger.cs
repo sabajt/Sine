@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class ClockTrigger : MonoBehaviour {
 
@@ -21,7 +22,6 @@ public class ClockTrigger : MonoBehaviour {
 	void Start () {
 		Vector3 pos = tube.transform.position;
 		tubePos = new Vector3 (pos.x, pos.y, pos.z - 0.2f);
-
 	}
 
 	void OnEnable () {
@@ -42,14 +42,28 @@ public class ClockTrigger : MonoBehaviour {
 		return ((360 / 12) * hour);
 	}
 
-	void MoveHand(int hour) {
+	void LerpHand(int hour) {
 		Vector3 rot = new Vector3 (hand.transform.rotation.x, hand.transform.rotation.y, RotationForClockHour(hour));
 		Quaternion handRot = Quaternion.Euler (rot);
 		hand.transform.rotation = Quaternion.Lerp (hand.transform.rotation, handRot, Time.deltaTime * 4.0f);
 	}
 
-	// Inspection Trigger
+	void StepHand (bool forward) {
+		int step = forward ? 1 : -1;
+		currentHour += step;
 
+		if (currentHour < MinHour) {
+			currentHour = MaxHour;
+		} else if (currentHour > MaxHour) {
+			currentHour = MinHour;
+		}
+
+		if (currentHour == CorrectHour) {
+			StartCoroutine(ShakeAfterDelay(0.33f));
+		}
+	}
+
+	// Inspection Trigger
 	void OnStartViewTarget () {
 
 	}
@@ -57,43 +71,32 @@ public class ClockTrigger : MonoBehaviour {
 	void OnEndViewTarget () {
 
 	}
-
+		
 	void OnUpdateViewingTarget () {
-
 		// Update hour
 		if (Input.GetKeyDown (KeyCode.LeftArrow)) {
-			currentHour--;
-			if (currentHour < MinHour) {
-				currentHour = MaxHour;
-			} 
+			StepHand (false);
 		}
 		if (Input.GetKeyDown (KeyCode.RightArrow)) {
-			currentHour++;
-			if (currentHour > MaxHour) {
-				currentHour = MinHour;
-			}
+			StepHand (true);
 		}
 			
 		// Move hand position
-		MoveHand(currentHour);
+		LerpHand(currentHour);
 
-		// Try and get the key
-		if (Input.GetKeyDown (KeyCode.Return)) {
-			// Shake
-			anim.SetTrigger(shakeHash);
+//			if (collectedTube) {
+//				inspectionTrigger.EndViewingTarget ();
+//			}
+//			collectedTube = true;
+//
+//			
+//		if (collectedTube) {
+//			tube.transform.position = Vector3.Lerp (tube.transform.position, tubePos, Time.deltaTime * 3.0f);
+//		}
+	}
 
-			if (currentHour == CorrectHour) {
-				
-			}
-
-			if (collectedTube) {
-				inspectionTrigger.EndViewingTarget ();
-			}
-			collectedTube = true;
-		}
-			
-		if (collectedTube) {
-			tube.transform.position = Vector3.Lerp (tube.transform.position, tubePos, Time.deltaTime * 3.0f);
-		}
+	IEnumerator ShakeAfterDelay(float time) {
+		yield return new WaitForSeconds(time);
+		anim.SetTrigger(shakeHash);
 	}
 }

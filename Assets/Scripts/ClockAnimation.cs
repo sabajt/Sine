@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ClockAnimation : MonoBehaviour {
 
+	public Animator anim;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -11,6 +13,7 @@ public class ClockAnimation : MonoBehaviour {
 
 	void ShakeFinished(){
 		Debug.Log ("Shake Finished");
+		anim.SetTrigger ("idle");
 	}
 	
 	// Update is called once per frame
