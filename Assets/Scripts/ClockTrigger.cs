@@ -7,6 +7,7 @@ public class ClockTrigger : MonoBehaviour {
 	public GameObject hand;
 	public GameObject clockModel;
 	public Animator anim;
+	public InspectionTrigger inspectionTrigger;
 
 	private int shakeHash = Animator.StringToHash("shake");
 
@@ -16,7 +17,6 @@ public class ClockTrigger : MonoBehaviour {
 
 	private bool collectedTube = false;
 	private Vector3 tubePos;
-	private InspectionTrigger inspectionTrigger;
 	private int currentHour = 12;
 
 	void Start () {
@@ -25,8 +25,6 @@ public class ClockTrigger : MonoBehaviour {
 	}
 
 	void OnEnable () {
-		inspectionTrigger = gameObject.GetComponent<InspectionTrigger> ();
-
 		inspectionTrigger.OnStartViewTarget += OnStartViewTarget;
 		inspectionTrigger.OnEndViewTarget += OnEndViewTarget;
 		inspectionTrigger.OnUpdateViewingTarget += OnUpdateViewingTarget;

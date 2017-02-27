@@ -5,16 +5,14 @@ using UnityEngine;
 
 public class RadioTrigger : MonoBehaviour {
 
+	public InspectionTrigger inspectionTrigger;
 	public List<AudioClip> audioClips = new List<AudioClip>();
 
 	const int radioIndexMax = 3;
 
 	private int radioIndex = 0;
-	private InspectionTrigger inspectionTrigger;
 
 	void OnEnable () {
-		inspectionTrigger = gameObject.GetComponent<InspectionTrigger> ();
-
 		inspectionTrigger.OnStartViewTarget += OnStartViewTarget;
 		inspectionTrigger.OnEndViewTarget += OnEndViewTarget;
 		inspectionTrigger.OnUpdateViewingTarget += OnUpdateViewingTarget;

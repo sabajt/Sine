@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class BookTrigger : MonoBehaviour {
 
+	public InspectionTrigger inspectionTrigger;
 	public GameObject bookshelf;
 	public AudioClip bookSlide;
 	public AudioClip bookReveal;
@@ -25,7 +26,6 @@ public class BookTrigger : MonoBehaviour {
 	private int bookIndex = 0;
 	private Vector3 origShelfPos; 
 	private Vector3 unlockShelfPos;
-	private InspectionTrigger inspectionTrigger;
 
 	void Start () {
 		SetupBooks ();
@@ -40,8 +40,6 @@ public class BookTrigger : MonoBehaviour {
 	}
 		
 	void OnEnable () {
-		inspectionTrigger = gameObject.GetComponent<InspectionTrigger> ();
-
 		inspectionTrigger.OnStartViewTarget += OnStartViewTarget;
 		inspectionTrigger.OnEndViewTarget += OnEndViewTarget;
 		inspectionTrigger.OnUpdateViewingTarget += OnUpdateViewingTarget;
